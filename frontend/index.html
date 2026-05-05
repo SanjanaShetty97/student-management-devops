@@ -1,194 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Management</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-        .container {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        button {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .delete-btn {
-            background-color: #f44336;
-            margin-left: 10px;
-        }
-        .delete-btn:hover {
-            background-color: #da190b;
-        }
-        .student-list {
-            margin-top: 20px;
-        }
-        .student-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            border-bottom: 1px solid #eee;
-        }
-        .student-info {
-            flex-grow: 1;
-        }
-        .student-name {
-            font-weight: bold;
-        }
-        .student-email {
-            color: #666;
-        }
-    </style>
-</head>
-<body>
-    <h1>Student Management System</h1>
-    <div class="container">
-        <form id="add-student-form">
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" id="name" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" required>
-            </div>
-            <button type="submit">Add Student</button>
-        </form>
-        
-        <div class="student-list" id="student-list">
-            <!-- Students will be displayed here -->
-        </div>
-    </div>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Student Management System</title>
 
-    <script>
-        const API_URL = 'http://localhost:5000/students';
-        
-        // Load students on page load
-        document.addEventListener('DOMContentLoaded', loadStudents);
-        
-        // Handle form submission
-        document.getElementById('add-student-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            addStudent();
-        });
-        
-        async function loadStudents() {
-            try {
-                const response = await fetch(API_URL);
-                const students = await response.json();
-                displayStudents(students);
-            } catch (error) {
-                console.error('Error loading students:', error);
-            }
-        }
-        
-        function displayStudents(students) {
-            const studentList = document.getElementById('student-list');
-            studentList.innerHTML = '';
-            
-            if (students.length === 0) {
-                studentList.innerHTML = '<p>No students found.</p>';
-                return;
-            }
-            
-            students.forEach(student => {
-                const studentDiv = document.createElement('div');
-                studentDiv.className = 'student-item';
-                
-                const studentInfo = document.createElement('div');
-                studentInfo.className = 'student-info';
-                studentInfo.innerHTML = `
-                    <div class="student-name">${student.name}</div>
-                    <div class="student-email">${student.email}</div>
-                `;
-                
-                const deleteBtn = document.createElement('button');
-                deleteBtn.className = 'delete-btn';
-                deleteBtn.textContent = 'Delete';
-                deleteBtn.onclick = () => deleteStudent(student.id);
-                
-                studentDiv.appendChild(studentInfo);
-                studentDiv.appendChild(deleteBtn);
-                studentList.appendChild(studentDiv);
-            });
-        }
-        
-        async function addStudent() {
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email })
-                });
-                
-                if (response.ok) {
-                    document.getElementById('name').value = '';
-                    document.getElementById('email').value = '';
-                    loadStudents(); // Reload the list
-                } else {
-                    console.error('Error adding student:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error adding student:', error);
-            }
-        }
-        
-        async function deleteStudent(id) {
-            try {
-                const response = await fetch(`${API_URL}/${id}`, {
-                    method: 'DELETE'
-                });
-                
-                if (response.ok) {
-                    loadStudents(); // Reload the list
-                } else {
-                    console.error('Error deleting student:', response.statusText);
-                }
-            } catch (error) {
-                console.error('Error deleting student:', error);
-            }
-    </script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      margin: 0;
+      padding: 0;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .add-btn {
+      background: #28a745;
+      color: white;
+      width: 100%;
+      margin-top: 10px;
+    }
+
+    .add-btn:hover {
+      background: #218838;
+    }
+
+    .student {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+
+    .delete-btn {
+      background: #dc3545;
+      color: white;
+    }
+
+    .delete-btn:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>Student Management</h1>
+
+  <input type="text" id="name" placeholder="Enter Name" />
+  <input type="email" id="email" placeholder="Enter Email" />
+
+  <button class="add-btn" onclick="addStudent()">Add Student</button>
+
+  <h3>Students</h3>
+  <div id="studentList"></div>
+</div>
+
+<script>
+  // 🔥 CHANGE THIS AFTER DEPLOYING BACKEND
+  const API = "https://student-management-p0a2.onrender.com/api/students";
+
+  async function fetchStudents() {
+    try {
+      const res = await fetch(API);
+      const data = await res.json();
+
+      const list = document.getElementById("studentList");
+      list.innerHTML = "";
+
+      if (data.length === 0) {
+        list.innerHTML = "<p>No students found.</p>";
+        return;
+      }
+
+      data.forEach(student => {
+        const div = document.createElement("div");
+        div.className = "student";
+
+        div.innerHTML = `
+          <span>${student.name} (${student.email})</span>
+          <button class="delete-btn" onclick="deleteStudent('${student._id}')">Delete</button>
+        `;
+
+        list.appendChild(div);
+      });
+
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function addStudent() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    if (!name || !email) {
+      alert("Please enter all fields");
+      return;
+    }
+
+    await fetch(API, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ name, email })
+    });
+
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+
+    fetchStudents();
+  }
+
+  async function deleteStudent(id) {
+    await fetch(`${API}/${id}`, {
+      method: "DELETE"
+    });
+
+    fetchStudents();
+  }
+
+  // Load students on page load
+  fetchStudents();
+</script>
+
 </body>
 </html>
